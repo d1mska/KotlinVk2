@@ -1,4 +1,5 @@
 Viikko 2
+
 Mockdata.kt tiedostosta saadaan listana valmiiksi syötettyä tietoa jotka on alustettu data classissa id: Int, title: String, description: String, priority: Int, dueDate: String, done: Boolean
 
 Kaikki funktionaalisuus ja sovelluksen asettelu olen hoitanun function.kt tiedostossa, josta sitten exporttaan HomeScreen näkymän MainActivityyn. Tässä tehtävässä käytetään viewModelia joten function piti siirtää erilliseen viewModel kansioon.
