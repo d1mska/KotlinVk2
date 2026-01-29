@@ -1,51 +1,68 @@
 package com.example.vk1teht.viewmodel
 
-import androidx.compose.material3.Text
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 
 import androidx.lifecycle.ViewModel
-import domain.Task
-import domain.mockData
+import com.example.vk1teht.Model.Task
+import com.example.vk1teht.Model.mockData
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import java.time.LocalDate
 
 class TaskViewModel : ViewModel() {
-    var newTask by   mutableStateOf("")
 
-    var tasks by mutableStateOf(listOf<Task>())
+    private val _newTask = MutableStateFlow("")
+    val newTask: StateFlow<String> = _newTask.asStateFlow()
 
+
+    private val _tasks = MutableStateFlow<List<Task>>(mockData)
+    val tasks: StateFlow<List<Task>> = _tasks.asStateFlow()
 
     var showOnlyDone by   mutableStateOf(false)
 
-
-    init {
-        tasks = mockData
+    private val _selectedTask = MutableStateFlow<Task?>(null)
+    val selectedTask: StateFlow<Task?> = _selectedTask
+    fun onNewTaskChange(newText: String) {
+        _newTask.value = newText
     }
 
-    fun addTask(title: String){
+    fun onTaskSelected(task: Task) {
+        _selectedTask.value = task
+    }
+
+    fun closeDialog() {
+        _selectedTask.value = null
+    }
+
+    fun updateTask(task: Task) {
+        _tasks.value = _tasks.value.map { if (it.id == task.id) task else it }
+        _selectedTask.value = null
+    }
+
+    fun addTask() {
+        val title = _newTask.value
         if (title.isBlank()) return
 
-        val newTask= Task(
-            id = tasks.size + 1,
+        val newTask = Task(
+            id = (_tasks.value.maxOfOrNull { it.id } ?: 0) + 1,
             title = title,
-            description = "kovakoodattu",
+            description= "",
             priority = 1,
-            dueDate = "2027-6-18",
+            dueDate = LocalDate.now(),
             done = false
         )
-        tasks= tasks + newTask
 
+        _tasks.value = _tasks.value + newTask
+        _newTask.value = ""
     }
 
-    fun toggleDone(tasks: List<Task>, taskId: Int): List<Task> {
-        return tasks.map { task ->
-            if (task.id == taskId) {
-                task.copy(done = !task.done)
-            } else {
-                task
-            }
+    fun toggleDone(taskId: Int) {
+        _tasks.value = _tasks.value.map { task ->
+            if (task.id == taskId) task.copy(done = !task.done)
+            else task
         }
     }
 
@@ -53,26 +70,16 @@ class TaskViewModel : ViewModel() {
         return tasks.filter{!it.done}
     }
 
-    fun deleteTask(tasks: List<Task>, taskId: Int): List<Task> {
-        return tasks.filter { it.id != taskId }
+    fun deleteTask(taskId: Int) {
+        _tasks.value = _tasks.value.filter { it.id != taskId }
     }
 
 
 
-    fun sortByDueDate(tasks: List<Task>):List<Task> {
-        return tasks.sortedBy { it.dueDate }
+    fun sortByDueDate(){
+        _tasks.value = _tasks.value.sortedBy { it.dueDate }
 
     }
-    /*
-    fun NewTaskField(
-        text: String,
-        onValueChange: (String) -> Unit
-    ){
-      OutlineTextField(
-        value = text,
-          label = {Text("Uusi tehtävä")}
-      )
-    }
-*/
+
 
 }
