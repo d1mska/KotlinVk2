@@ -42,22 +42,33 @@ class TaskViewModel : ViewModel() {
         _selectedTask.value = null
     }
 
-    fun addTask() {
-        val title = _newTask.value
+    var showAddDialog by mutableStateOf(false)
+        private set
+
+    fun openAddDialog() {
+        showAddDialog = true
+    }
+
+    fun closeAddDialog() {
+        showAddDialog = false
+    }
+
+    fun addTask(title: String, description: String, dueDate: LocalDate) {
         if (title.isBlank()) return
 
         val newTask = Task(
             id = (_tasks.value.maxOfOrNull { it.id } ?: 0) + 1,
             title = title,
-            description= "",
+            description = description,
             priority = 1,
-            dueDate = LocalDate.now(),
+            dueDate = dueDate,
             done = false
         )
 
         _tasks.value = _tasks.value + newTask
         _newTask.value = ""
     }
+
 
     fun toggleDone(taskId: Int) {
         _tasks.value = _tasks.value.map { task ->

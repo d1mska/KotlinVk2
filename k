@@ -1,0 +1,439 @@
+[33mcommit 5f35cf097feb8b658f9cd2eebf81f2d203d9a5f8[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mmaster[m[33m, [m[1;33mtag: [m[1;33mweek3[m[33m)[m
+Author: Timo Moilanen <t3moti00@students.oamk.fi>
+Date:   Thu Jan 29 13:52:00 2026 +0200
+
+    dialog alert and MVVD
+
+[1mdiff --git a/app/build.gradle.kts b/app/build.gradle.kts[m
+[1mindex 6ed4a8f..b0c70f1 100644[m
+[1m--- a/app/build.gradle.kts[m
+[1m+++ b/app/build.gradle.kts[m
+[36m@@ -32,6 +32,7 @@[m [mandroid {[m
+     compileOptions {[m
+         sourceCompatibility = JavaVersion.VERSION_11[m
+         targetCompatibility = JavaVersion.VERSION_11[m
+[32m+[m[32m        isCoreLibraryDesugaringEnabled = true[m
+     }[m
+     kotlinOptions {[m
+         jvmTarget = "11"[m
+[36m@@ -42,6 +43,7 @@[m [mandroid {[m
+ }[m
+ [m
+ dependencies {[m
+[32m+[m[32m    coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.0.4")[m
+     implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.6.1")[m
+     implementation(libs.androidx.core.ktx)[m
+     implementation(libs.androidx.lifecycle.runtime.ktx)[m
+[1mdiff --git a/app/src/main/java/com/example/vk1teht/MainActivity.kt b/app/src/main/java/com/example/vk1teht/MainActivity.kt[m
+[1mindex 2316bbb..b6ece99 100644[m
+[1m--- a/app/src/main/java/com/example/vk1teht/MainActivity.kt[m
+[1m+++ b/app/src/main/java/com/example/vk1teht/MainActivity.kt[m
+[36m@@ -4,10 +4,8 @@[m [mimport android.os.Bundle[m
+ import androidx.activity.ComponentActivity[m
+ import androidx.activity.compose.setContent[m
+ import androidx.activity.enableEdgeToEdge[m
+[31m-import androidx.compose.runtime.Composable[m
+[31m-import androidx.compose.ui.tooling.preview.Preview[m
+ import com.example.vk1teht.ui.theme.Vk1tehtTheme[m
+[31m-import domain.HomeScreen[m
+[32m+[m[32mimport com.example.vk1teht.View.HomeScreen[m
+ [m
+ class MainActivity : ComponentActivity() {[m
+     override fun onCreate(savedInstanceState: Bundle?) {[m
+[36m@@ -22,11 +20,3 @@[m [mclass MainActivity : ComponentActivity() {[m
+ }[m
+ [m
+ [m
+[31m-[m
+[31m-@Preview(showBackground = true)[m
+[31m-@Composable[m
+[31m-fun GreetingPreview() {[m
+[31m-    Vk1tehtTheme {[m
+[31m-        HomeScreen()[m
+[31m-    }[m
+[31m-}[m
+[1mdiff --git a/app/src/main/java/com/example/vk1teht/Model/mockdata.kt b/app/src/main/java/com/example/vk1teht/Model/mockdata.kt[m
+[1mnew file mode 100644[m
+[1mindex 0000000..3eb9e1a[m
+[1m--- /dev/null[m
+[1m+++ b/app/src/main/java/com/example/vk1teht/Model/mockdata.kt[m
+[36m@@ -0,0 +1,12 @@[m
+[32m+[m[32mpackage com.example.vk1teht.Model[m
+[32m+[m
+[32m+[m[32mimport java.time.LocalDate[m
+[32m+[m
+[32m+[m[32mval mockData= listOf([m
+[32m+[m[32m    Task(id=1, title="ostoslista", description="lista", priority = 1, dueDate = LocalDate.of(2026, 12, 12), done = true ) ,[m
+[32m+[m[32m    Task(id=2, title="työlista", description="lista", priority = 2, dueDate = LocalDate.of(2026, 2, 7), done = false ),[m
+[32m+[m[32m    Task(id=3, title="tehtävälista", description="lista", priority = 3, dueDate = LocalDate.of(2036, 2, 9), done = false ),[m
+[32m+[m[32m    Task(id=4, title="kotityöt", description="lista", priority = 4, dueDate = LocalDate.of(2027, 12, 5), done = true ),[m
+[32m+[m[32m    Task(id=5, title="remontti", description="huolto", priority = 1, dueDate = LocalDate.of(2035, 1, 1), done = false ),[m
+[32m+[m[32m    Task(id=6, title="vika", description="huomautus", priority = 1, dueDate = LocalDate.of(2026, 1, 4), done = false ),[m
+[32m+[m[32m)[m
+\ No newline at end of file[m
+[1mdiff --git a/app/src/main/java/domain/task.kt b/app/src/main/java/com/example/vk1teht/Model/task.kt[m
+[1msimilarity index 59%[m
+[1mrename from app/src/main/java/domain/task.kt[m
+[1mrename to app/src/main/java/com/example/vk1teht/Model/task.kt[m
+[1mindex dadcd9d..b5588a7 100644[m
+[1m--- a/app/src/main/java/domain/task.kt[m
+[1m+++ b/app/src/main/java/com/example/vk1teht/Model/task.kt[m
+[36m@@ -1,10 +1,12 @@[m
+[31m-package domain[m
+[32m+[m[32mpackage com.example.vk1teht.Model[m
+[32m+[m
+[32m+[m[32mimport java.time.LocalDate[m
+ [m
+ data class Task ([m
+     val id: Int,[m
+     val title: String,[m
+     val description: String,[m
+     val priority: Int,[m
+[31m-    val dueDate: String,[m
+[32m+[m[32m    val dueDate: LocalDate,[m
+     val done: Boolean[m
+ )[m
+\ No newline at end of file[m
+[1mdiff --git a/app/src/main/java/com/example/vk1teht/View/AlertDialog.kt b/app/src/main/java/com/example/vk1teht/View/AlertDialog.kt[m
+[1mnew file mode 100644[m
+[1mindex 0000000..f8af79e[m
+[1m--- /dev/null[m
+[1m+++ b/app/src/main/java/com/example/vk1teht/View/AlertDialog.kt[m
+[36m@@ -0,0 +1,62 @@[m
+[32m+[m[32mpackage com.example.vk1teht.View[m
+[32m+[m
+[32m+[m[32mimport androidx.compose.foundation.layout.Arrangement[m
+[32m+[m[32mimport androidx.compose.foundation.layout.Column[m
+[32m+[m[32mimport androidx.compose.foundation.layout.Row[m
+[32m+[m[32mimport androidx.compose.foundation.layout.fillMaxWidth[m
+[32m+[m[32mimport androidx.compose.material3.AlertDialog[m
+[32m+[m[32mimport androidx.compose.material3.Button[m
+[32m+[m[32mimport androidx.compose.material3.Text[m
+[32m+[m[32mimport androidx.compose.material3.TextButton[m
+[32m+[m[32mimport androidx.compose.material3.TextField[m
+[32m+[m[32mimport androidx.compose.runtime.Composable[m
+[32m+[m[32mimport androidx.compose.runtime.collectAsState[m
+[32m+[m[32mimport androidx.compose.runtime.getValue[m
+[32m+[m[32mimport androidx.compose.runtime.mutableStateOf[m
+[32m+[m[32mimport androidx.compose.runtime.remember[m
+[32m+[m[32mimport androidx.compose.runtime.setValue[m
+[32m+[m[32mimport androidx.compose.ui.Modifier[m
+[32m+[m[32mimport androidx.lifecycle.viewmodel.compose.viewModel[m
+[32m+[m[32mimport com.example.vk1teht.Model.Task[m
+[32m+[m[32mimport com.example.vk1teht.viewmodel.TaskViewModel[m
+[32m+[m
+[32m+[m[32m@Composable[m
+[32m+[m[32mfun DetailDialog(viewModel: TaskViewModel = viewModel(), task: Task, onClose: () -> Unit, onUpdate: (Task) -> Unit){[m
+[32m+[m[32m    var title by remember { mutableStateOf(task.title) }[m
+[32m+[m[32m    var description by remember { mutableStateOf(task.description) }[m
+[32m+[m
+[32m+[m
+[32m+[m[32m        AlertDialog([m
+[32m+[m[32m            onDismissRequest = onClose,[m
+[32m+[m[32m            title = {[m
+[32m+[m[32m                Text(text = "Edit task")[m
+[32m+[m[32m            },[m
+[32m+[m[32m            text = {[m
+[32m+[m[32m                Column{[m
+[32m+[m[32m                    TextField(value = title, onValueChange = {title = it})[m
+[32m+[m[32m                    TextField(value = description, onValueChange = {description = it})[m
+[32m+[m[32m                }[m
+[32m+[m[32m            },[m
+[32m+[m[32m            confirmButton = {[m
+[32m+[m[32m                Row([m
+[32m+[m[32m                    modifier = Modifier.fillMaxWidth(),[m
+[32m+[m[32m                    horizontalArrangement = Arrangement.SpaceBetween[m
+[32m+[m[32m                ) {[m
+[32m+[m[32m                    Button(onClick = {[m
+[32m+[m[32m                        viewModel.deleteTask(task.id)[m
+[32m+[m[32m                        onClose()[m
+[32m+[m[32m                    }) {[m
+[32m+[m[32m                        Text(text = "Delete")[m
+[32m+[m[32m                    }[m
+[32m+[m[32m                    Button([m
+[32m+[m[32m                        onClick = {[m
+[32m+[m[32m                            onUpdate(task.copy(title = title, description = description))[m
+[32m+[m[32m                        }[m
+[32m+[m[32m                    ) {[m
+[32m+[m[32m                        Text("save")[m
+[32m+[m[32m                    }[m
+[32m+[m[32m                }[m
+[32m+[m[32m            }[m
+[32m+[m[32m        )[m
+[32m+[m[32m    }[m
+[32m+[m
+[1mdiff --git a/app/src/main/java/domain/function.kt b/app/src/main/java/com/example/vk1teht/View/HomeScreen.kt[m
+[1msimilarity index 59%[m
+[1mrename from app/src/main/java/domain/function.kt[m
+[1mrename to app/src/main/java/com/example/vk1teht/View/HomeScreen.kt[m
+[1mindex 2ba8bf6..6d2cbf2 100644[m
+[1m--- a/app/src/main/java/domain/function.kt[m
+[1m+++ b/app/src/main/java/com/example/vk1teht/View/HomeScreen.kt[m
+[36m@@ -1,9 +1,7 @@[m
+[31m-package domain[m
+[32m+[m[32mpackage com.example.vk1teht.View[m
+ [m
+[31m-import android.R.id.checkbox[m
+[31m-import android.graphics.Color.blue[m
+[31m-import android.view.RoundedCorner[m
+ import androidx.compose.foundation.background[m
+[32m+[m[32mimport androidx.compose.foundation.clickable[m
+ import androidx.compose.foundation.layout.Arrangement[m
+ import androidx.compose.foundation.layout.Column[m
+ import androidx.compose.foundation.layout.Row[m
+[36m@@ -11,46 +9,40 @@[m [mimport androidx.compose.foundation.layout.fillMaxSize[m
+ import androidx.compose.foundation.layout.fillMaxWidth[m
+ import androidx.compose.foundation.layout.padding[m
+ import androidx.compose.foundation.layout.PaddingValues[m
+[31m-import androidx.compose.foundation.layout.Spacer[m
+[31m-import androidx.compose.foundation.layout.height[m
+ import androidx.compose.foundation.layout.wrapContentHeight[m
+ import androidx.compose.foundation.lazy.LazyColumn[m
+ import androidx.compose.foundation.lazy.items[m
+ import androidx.compose.foundation.shape.RoundedCornerShape[m
+ import androidx.compose.material3.BottomAppBar[m
+ import androidx.compose.material3.Button[m
+[32m+[m[32mimport androidx.compose.material3.Card[m
+ import androidx.compose.material3.Checkbox[m
+ import androidx.compose.material3.OutlinedTextField[m
+ import androidx.compose.material3.Scaffold[m
+ import androidx.compose.material3.Text[m
+[31m-import androidx.compose.material3.TextField[m
+ import androidx.compose.runtime.Composable[m
+[32m+[m[32mimport androidx.compose.runtime.collectAsState[m
+ import androidx.compose.runtime.getValue[m
+[31m-import androidx.compose.runtime.mutableStateOf[m
+[31m-import androidx.compose.runtime.remember[m
+[31m-import androidx.compose.runtime.setValue[m
+ import androidx.compose.ui.Alignment[m
+ import androidx.compose.ui.Modifier[m
+ import androidx.compose.ui.draw.clip[m
+ import androidx.compose.ui.graphics.Color[m
+[31m-import androidx.compose.ui.tooling.preview.Preview[m
+ import androidx.compose.ui.unit.dp[m
+ import androidx.compose.ui.unit.sp[m
+ import androidx.lifecycle.viewmodel.compose.viewModel[m
+[31m-import com.example.vk1teht.ui.theme.Vk1tehtTheme[m
+ import com.example.vk1teht.viewmodel.TaskViewModel[m
+[31m-import kotlin.Int[m
+[31m-import kotlin.String[m
+[31m-[m
+ [m
+ [m
+ @Composable[m
+ fun HomeScreen(viewModel: TaskViewModel = viewModel()) {[m
+[32m+[m[32m    val newTaskValue by viewModel.newTask.collectAsState()[m
+[32m+[m[32m    val tasks by viewModel.tasks.collectAsState()[m
+[32m+[m[32m    val selectedTask by viewModel.selectedTask.collectAsState()[m
+ [m
+     val visibleTasks = if (viewModel.showOnlyDone) {[m
+[31m-        viewModel.filterByDone(viewModel.tasks)[m
+[32m+[m[32m        viewModel.filterByDone(tasks)[m
+     } else {[m
+[31m-        viewModel.tasks[m
+[32m+[m[32m        tasks[m
+     }[m
+ [m
+     Scaffold([m
+[36m@@ -78,7 +70,7 @@[m [mfun HomeScreen(viewModel: TaskViewModel = viewModel()) {[m
+                             )[m
+                         }[m
+                         Button(onClick = {[m
+[31m-                            viewModel.tasks = viewModel.sortByDueDate(viewModel.tasks)[m
+[32m+[m[32m                            viewModel.sortByDueDate()[m
+                         }) {[m
+                             Text(text = "Sort Due Date")[m
+                         }[m
+[36m@@ -100,23 +92,23 @@[m [mfun HomeScreen(viewModel: TaskViewModel = viewModel()) {[m
+ [m
+ [m
+         ) {[m
+[31m-[m
+                 OutlinedTextField([m
+[31m-                    value = viewModel.newTask,[m
+[31m-                    onValueChange = { viewModel.newTask = it },[m
+[32m+[m[32m                    value = newTaskValue,[m
+[32m+[m[32m                    onValueChange = { newText ->[m
+[32m+[m[32m                        viewModel.onNewTaskChange(newText)[m
+[32m+[m[32m                    },[m
+                     modifier = Modifier.weight(1f),[m
+                     placeholder = { Text("New task") }[m
+                 )[m
+ [m
+                 Button([m
+                     onClick = {[m
+[31m-                        viewModel.addTask(viewModel.newTask)[m
+[31m-                        viewModel.newTask = ""[m
+[32m+[m[32m                        viewModel.addTask()[m
+[32m+[m
+                     }) {[m
+                     Text("Add")[m
+                 }[m
+             }[m
+[31m-[m
+             LazyColumn([m
+                 modifier = Modifier.fillMaxSize(),[m
+                 contentPadding = PaddingValues([m
+[36m@@ -125,47 +117,57 @@[m [mfun HomeScreen(viewModel: TaskViewModel = viewModel()) {[m
+                     bottom = 15.dp[m
+                 ),[m
+                 verticalArrangement = Arrangement.spacedBy(8.dp)[m
+[31m-[m
+             ) {[m
+[31m-[m
+                 items(visibleTasks) { task ->[m
+[31m-                    Row([m
+[32m+[m[32m                    Card([m
+                         modifier = Modifier[m
+[32m+[m[32m                            .background(color = Color.White)[m
+[32m+[m[32m                            .padding(8.dp)[m
+                             .fillMaxWidth()[m
+[31m-                            .clip(RoundedCornerShape(10.dp))[m
+[31m-                            .background(Color.Red),[m
+[31m-                            verticalAlignment = Alignment.CenterVertically[m
+[31m-[m
+[31m-[m
+[31m-[m
+[32m+[m[32m                            .clickable {[m
+[32m+[m[32m                                viewModel.onTaskSelected(task)[m
+[32m+[m[32m                            }[m
+                     ) {[m
+[31m-[m
+[31m-                        Checkbox([m
+[31m-                            checked = task.done,[m
+[31m-                            onCheckedChange = {[m
+[31m-                                viewModel.tasks = viewModel.toggleDone(viewModel.tasks, task.id)[m
+[32m+[m[32m                        Column() {[m
+[32m+[m[32m                            Row([m
+[32m+[m[32m                                modifier = Modifier[m
+[32m+[m[32m                                    .fillMaxWidth()[m
+[32m+[m[32m                                    .clip(RoundedCornerShape(10.dp)),[m
+[32m+[m
+[32m+[m[32m                                verticalAlignment = Alignment.CenterVertically,[m
+[32m+[m[32m                                horizontalArrangement = Arrangement.SpaceBetween[m
+[32m+[m[32m                            ) {[m
+[32m+[m[32m                                Checkbox([m
+[32m+[m[32m                                    checked = task.done,[m
+[32m+[m[32m                                    onCheckedChange = {[m
+[32m+[m[32m                                        viewModel.toggleDone(task.id)[m
+[32m+[m[32m                                    }[m
+[32m+[m[32m                                )[m
+[32m+[m[32m                                Text([m
+[32m+[m[32m                                    "${task.title}",[m
+[32m+[m[32m                                    modifier = Modifier[m
+[32m+[m[32m                                        .weight(1f),[m
+[32m+[m[32m                                )[m
+[32m+[m[32m                                Text([m
+[32m+[m[32m                                    "${task.dueDate}",[m
+[32m+[m[32m                                    modifier = Modifier[m
+[32m+[m[32m                                        .weight(1f),[m
+[32m+[m
+[32m+[m[32m                                    )[m
+                             }[m
+[31m-                        )[m
+[31m-                        Text("${task.title} | ${task.dueDate}",[m
+[31m-                            modifier = Modifier[m
+[31m-                                .weight(1f),[m
+[31m-[m
+[31m-[m
+[31m-[m
+[31m-                        )[m
+[31m-[m
+[31m-                        Button(onClick = {[m
+[31m-                            viewModel.tasks = viewModel.deleteTask(viewModel.tasks, task.id)[m
+[31m-                        }) {[m
+[31m-                            Text(text = "Delete")[m
+[32m+[m[32m                            Text([m
+[32m+[m[32m                                "${task.description}",[m
+[32m+[m[32m                                modifier = Modifier[m
+[32m+[m[32m                                    .padding(10.dp)[m
+[32m+[m[32m                            )[m
+                         }[m
+                     }[m
+                 }[m
+[31m-[m
+[31m-[m
+             }[m
+[31m-[m
+         }[m
+[31m-[m
+     }[m
+[31m-}[m
+\ No newline at end of file[m
+[32m+[m[32m    if (selectedTask != null) {[m
+[32m+[m[32m        DetailDialog(task = selectedTask!!, onClose = {viewModel.closeDialog()}, onUpdate = {viewModel.updateTask(it)})[m
+[32m+[m[32m    }[m
+[32m+[m[32m}[m
+[41m+[m
+[1mdiff --git a/app/src/main/java/com/example/vk1teht/viewmodel/TaskViewModel.kt b/app/src/main/java/com/example/vk1teht/viewmodel/TaskViewModel.kt[m
+[1mindex 8b9d5b5..d8bbbaf 100644[m
+[1m--- a/app/src/main/java/com/example/vk1teht/viewmodel/TaskViewModel.kt[m
+[1m+++ b/app/src/main/java/com/example/vk1teht/viewmodel/TaskViewModel.kt[m
+[36m@@ -1,51 +1,68 @@[m
+ package com.example.vk1teht.viewmodel[m
+ [m
+[31m-import androidx.compose.material3.Text[m
+ import androidx.compose.runtime.mutableStateOf[m
+ import androidx.compose.runtime.setValue[m
+ import androidx.compose.runtime.getValue[m
+[31m-import androidx.compose.runtime.remember[m
+[31m-import androidx.compose.runtime.setValue[m
+ [m
+ import androidx.lifecycle.ViewModel[m
+[31m-import domain.Task[m
+[31m-import domain.mockData[m
+[32m+[m[32mimport com.example.vk1teht.Model.Task[m
+[32m+[m[32mimport com.example.vk1teht.Model.mockData[m
+[32m+[m[32mimport kotlinx.coroutines.flow.MutableStateFlow[m
+[32m+[m[32mimport kotlinx.coroutines.flow.StateFlow[m
+[32m+[m[32mimport kotlinx.coroutines.flow.asStateFlow[m
+[32m+[m[32mimport java.time.LocalDate[m
+ [m
+ class TaskViewModel : ViewModel() {[m
+[31m-    var newTask by   mutableStateOf("")[m
+ [m
+[31m-    var tasks by mutableStateOf(listOf<Task>())[m
+[32m+[m[32m    private val _newTask = MutableStateFlow("")[m
+[32m+[m[32m    val newTask: StateFlow<String> = _newTask.asStateFlow()[m
+[32m+[m
+ [m
+[32m+[m[32m    private val _tasks = MutableStateFlow<List<Task>>(mockData)[m
+[32m+[m[32m    val tasks: StateFlow<List<Task>> = _tasks.asStateFlow()[m
+ [m
+     var showOnlyDone by   mutableStateOf(false)[m
+ [m
+[32m+[m[32m    private val _selectedTask = MutableStateFlow<Task?>(null)[m
+[32m+[m[32m    val selectedTask: StateFlow<Task?> = _selectedTask[m
+[32m+[m[32m    fun onNewTaskChange(newText: String) {[m
+[32m+[m[32m        _newTask.value = newText[m
+[32m+[m[32m    }[m
+[32m+[m
+[32m+[m[32m    fun onTaskSelected(task: Task) {[m
+[32m+[m[32m        _selectedTask.value = task[m
+[32m+[m[32m    }[m
+ [m
+[31m-    init {[m
+[31m-        tasks = mockData[m
+[32m+[m[32m    fun closeDialog() {[m
+[32m+[m[32m        _selectedTask.value = null[m
+     }[m
+ [m
+[31m-    fun addTask(title: String){[m
+[32m+[m[32m    fun updateTask(task: Task) {[m
+[32m+[m[32m        _tasks.value = _tasks.value.map { if (it.id == task.id) task else it }[m
+[32m+[m[32m        _selectedTask.value = null[m
+[32m+[m[32m    }[m
+[32m+[m
+[32m+[m[32m    fun addTask() {[m
+[32m+[m[32m        val title = _newTask.value[m
+         if (title.isBlank()) return[m
+ [m
+[31m-        val newTask= Task([m
+[31m-            id = tasks.size + 1,[m
+[32m+[m[32m        val newTask = Task([m
+[32m+[m[32m            id = (_tasks.value.maxOfOrNull { it.id } ?: 0) + 1,[m
+             title = title,[m
+[31m-            description = "kovakoodattu",[m
+[32m+[m[32m            description= "",[m
+             priority = 1,[m
+[31m-            dueDate = "20
